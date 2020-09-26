@@ -3,15 +3,15 @@ import os
 import numpy as np
 
 class OpencvText():
-    def __init__(self, folder='test_images/', input_path='input/', output_path='output/', text=None):
+    def __init__(self, folder='./', input_path='input/', output_path='output/'):
         self.folder = folder
         self.input_path = input_path
         self.output_path = output_path
-        self.text = text
     
 
-    def write_text(self, img_name, text):
+    def write_text(self, img_name, text): # returns (extension of image, modified image)
         img = cv2.imread(img_name, cv2.COLOR_BGR2RGB)
+        if img is None: raise 'Not an image or not in correct format!'
         thickness = 2
         ratio_sin = 1
 
@@ -35,9 +35,10 @@ class OpencvText():
         box_coords = ((text_offset_x, text_offset_y), (text_offset_x + text_width + int(15 * ratio_sin), text_offset_y - text_height - int(15 * ratio_sin)))
         cv2.rectangle(img, box_coords[0], box_coords[1], rectangle_bgr, cv2.FILLED)
         cv2.putText(img, text, (text_offset_x, text_offset_y-int(10 * ratio_sin)), cv2.FONT_HERSHEY_COMPLEX, fontScale=font_scale, color=(51, 153, 255), thickness=thickness)
-        cv2.imwrite(os.path.join(self.folder, self.output_path, text)[:-1]+os.path.splitext(img_name)[1], img)
+        return os.path.splitext(img_name)[1], img
+        # cv2.imwrite(os.path.join(self.folder, self.output_path, text)[:-1]+os.path.splitext(img_name)[1], img)
 
-    def image_filenames(self, folder):
+    def image_filenames(self, folder): # list all valid images
         img_files = []
         for filename in os.listdir(folder):
             img = cv2.imread(os.path.join(folder,filename))
@@ -45,15 +46,27 @@ class OpencvText():
                 img_files.append(os.path.join(folder,filename))
         return img_files
 
-    def run(self):
+    def run_folder(self, text_array=None):
         i = 0
         for im in self.image_filenames(os.path.join(self.folder, self.input_path)):
-            if self.text != None:
-                for txt in self.text:
-                    self.write_text(im, txt)
+            if text_array != None:
+                for txt in text_array:
+                    ext, img = self.write_text(im, txt)
+                    cv2.imwrite(os.path.join(self.folder, self.output_path, text)[:-1]+ext, img)
             else:
                 i += 1
-                self.write_text(im, f'{i}hello this is just a test for checking out opencv write on image!')
-    
-op = OpencvText()
-op.run()
+                text = f'{i}hello this is just a test for checking out opencv write on image!'
+                ext, img = self.write_text(im, text)
+                cv2.imwrite(os.path.join(self.folder, self.output_path, text)[:-1]+ext, img)
+
+    def run_image(self, image, text):
+        if image != None and text != None:
+            ext, img = self.write_text(image, text)
+            cv2.imwrite(os.path.join(os.path.dirname(image), text)+ext, img)
+        else:
+            raise 'Input image and text'
+
+
+# op = OpencvText()
+# op.run_folder()
+# op.run_image('input/6t8Zh249QiFmVnkQdCCtHK.jpg', 'test image')
