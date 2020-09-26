@@ -78,7 +78,7 @@ class OpencvText():
         cv2.imwrite(os.path.join(output_dir, text)+f'.{ext}', img)
 
 
-op = OpencvText()
-op.run_folder()
+# op = OpencvText()
+# op.run_folder()
 # op.run_image('input/6t8Zh249QiFmVnkQdCCtHK.jpg', 'test image')
 # op.run_numpy_image(op.read_img('input/6t8Zh249QiFmVnkQdCCtHK.jpg'), 'numpy test on sample image', output_dir='input', ext='png')
